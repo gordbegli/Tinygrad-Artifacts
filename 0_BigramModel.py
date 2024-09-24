@@ -25,12 +25,14 @@ for w in words:
 
 N = Tensor(N_array, dtype=dtypes.float16)
 
+P = N.float()
+P /= P.sum(axis=1, keepdim=True) # Keepdim is necessary, otherwise broadcasting will fuck up the dimensions
+
 for i in range(20):
     ix = 0
     out = []
     while True:
-        row = N[ix]
-        row_probs = row / row.sum()
+        row_probs = P[ix]
         ix = row_probs.multinomial(num_samples=1).item()
         out.append(itos[ix])
         if ix == 0:
