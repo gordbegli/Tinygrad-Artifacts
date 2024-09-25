@@ -41,4 +41,4 @@ for k in range(10):
     W.grad = None
     loss.backward()
 
-    W = W - (0.1 * W.grad)
+    W = W - (0.1 * W.grad) #This is slow as hell. Tinygrad doesn't support in place operations, but the real way is to use an optimizer anyway to run things?
