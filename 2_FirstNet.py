@@ -16,7 +16,7 @@ itos = {i:s for s,i in stoi.items()}
 xs = []
 ys = []
 
-for w in words:
+for w in words[:1]:
     chs = ['.'] + list(w) + ['.']
     for ch1, ch2 in zip(chs, chs[1:]):
         ix1 = stoi[ch1]
@@ -29,14 +29,16 @@ ys = Tensor(ys)
 num = len(xs)
 W = Tensor.randn((27, 27), requires_grad=True)
 
+# Add this after initializing W
+g = Tensor.manual_seed(2147483647)
 
-for k in range(10):
+for k in range(1):
     xenc = xs.one_hot(27).float()
     logits = xenc @ W 
     counts = logits.exp() #Formatting
     probs = counts / counts.sum(1, keepdim=True)
 
-    loss = -probs[Tensor.arange(num), ys].log().mean() # fancy indexing
+    loss = -probs[Tensor.arange(num), ys].log().mean() + 0.01 * (W**2).mean() # fancy indexing
     print(loss.numpy())
     W.grad = None
     loss.backward()

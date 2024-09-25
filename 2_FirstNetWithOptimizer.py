@@ -32,10 +32,13 @@ W = Tensor.randn((27, 27), requires_grad=True)
 # Initialize the optimizer
 opt = Adam([W], lr=0.1)
 
-# Enable training mode
+# Add this after initializing the optimizer
+g = Tensor.manual_seed(2147483647)
+
+# Need to enable training mode
 Tensor.training = True  # <--- Added line
 
-for k in range(1):
+for k in range(200):
     xenc = xs.one_hot(27).float()
     print("One-hot encoded input shape:", xenc.shape)
     
@@ -48,10 +51,10 @@ for k in range(1):
     probs = counts / counts.sum(1, keepdim=True)
     print("Probabilities shape:", probs.shape)
 
-    loss = -probs[Tensor.arange(num), ys].log().mean() # fancy indexing
+    loss = -probs[Tensor.arange(num), ys].log().mean()  + 0.01 * (W**2).mean() # fancy indexing
     print("Loss:", loss.numpy())
 
-    opt.zero_grad()
+    opt.zero_grad() #This is the "real" way, still's slow
     print("Gradients zeroed")
     
     loss.backward()
@@ -60,6 +63,3 @@ for k in range(1):
     opt.step()
     print("Optimizer step taken")
     print("Updated W shape:", W.shape)
-
-# Optionally, disable training mode after training
-Tensor.training = False  # <--- Optional
