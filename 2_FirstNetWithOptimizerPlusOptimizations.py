@@ -18,7 +18,7 @@ itos = {i: s for s, i in stoi.items()}
 xs = []
 ys = []
 
-for w in words:
+for w in words[:1]:
     chs = ['.'] + list(w) + ['.']
     for ch1, ch2 in zip(chs, chs[1:]):
         ix1 = stoi[ch1]
@@ -41,7 +41,8 @@ Tensor.training = True
 xenc = xs.one_hot(27).float()
 
 # Training loop
-for k in range(50):
+iters = 1000
+for k in range(iters):
     logits = xenc @ W
     counts = logits.exp()
     probs = counts / counts.sum(1, keepdim=True)
@@ -54,10 +55,12 @@ for k in range(50):
     print(k)
 
     out = []
-    if k == 49:
+    if k == (iters-1):
         print(loss.numpy())
+        ix = 0  # Start with the index for '.'
+        out = []
         while True:
-            xenc = Tensor.one_hot(Tensor([0]), num_classes=27).float()
+            xenc = Tensor.one_hot(Tensor([ix]), num_classes=27).float()
             logits = xenc @ W
             counts = logits.exp()
             p = counts / counts.sum(1, keepdim=True)
