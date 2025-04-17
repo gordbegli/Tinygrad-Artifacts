@@ -1,3 +1,3 @@
-Right now this repo is a place for me to put artifacts from following Neural Networks: Zero to Hero in Tinygrad.
+Artifacts from exploring Tinygrad.
 
-I'm probably still debugging code from the latest lesson.
+https://github.com/tinygrad/tinygrad/commit/19ae829bd19b4ffc09d57262b9ac6485ed5ed2b2
