@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>_pool((5,)) Animation with Results</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    .container { position: relative; display: inline-block; margin-bottom: 20px; }
+    .cell {
+      width: 40px; height: 40px;
+      box-sizing: border-box;
+      border: 1px solid #333;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .highlight {
+      position: absolute;
+      top: 0;
+      height: 40px;
+      box-sizing: border-box;
+      border: 3px solid crimson;
+      pointer-events: none;
+      transition: left 0.4s ease;
+    }
+    #window-values {
+      margin-top: 8px;
+      font-size: 1.1rem;
+    }
+    .windows-container {
+      margin-top: 20px;
+    }
+    .window-row {
+      display: flex;
+      margin-bottom: 4px;
+    }
+    .window-cell {
+      width: 30px; height: 30px;
+      box-sizing: border-box;
+      border: 1px solid #666;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      margin-right: 2px;
+    }
+    .window-row.highlight-row .window-cell {
+      background-color: rgba(255, 0, 0, 0.1);
+      border-color: crimson;
+    }
+  </style>
+</head>
+<body>
+  <h2>[0,0,0,0,1,1,1,1,1]._pool((5,))</h2>
+
+  <!-- Input strip + sliding highlight -->
+  <div class="container" id="input-container"></div>
+  <div id="window-values"></div>
+
+  <!-- Full 5×5 result grid -->
+  <div class="windows-container" id="windows-container"></div>
+
+  <script>
+    const input = [0,0,0,0,1,1,1,1,1];
+    const k = 5;
+    const maxPos = input.length - k;
+    let pos = 0;
+
+    // 1) Render input strip
+    const container = document.getElementById('input-container');
+    input.forEach(v => {
+      const cell = document.createElement('div');
+      cell.className = 'cell';
+      cell.textContent = v;
+      container.appendChild(cell);
+    });
+
+    // 2) Sliding highlight overlay
+    const highlight = document.createElement('div');
+    highlight.className = 'highlight';
+    highlight.style.width = (k * 40) + 'px';
+    container.appendChild(highlight);
+
+    // 3) Window values text
+    const windowDisplay = document.getElementById('window-values');
+
+    // 4) Precompute all windows (tinygrad returns these)
+    const windows = [];
+    for (let i = 0; i <= maxPos; i++) {
+      windows.push(input.slice(i, i + k));
+    }
+
+    // 5) Render full result matrix
+    const winContainer = document.getElementById('windows-container');
+    windows.forEach((win, idx) => {
+      const row = document.createElement('div');
+      row.className = 'window-row';
+      row.id = 'row-'+idx;
+      win.forEach(val => {
+        const c = document.createElement('div');
+        c.className = 'window-cell';
+        c.textContent = val;
+        row.appendChild(c);
+      });
+      winContainer.appendChild(row);
+    });
+
+    // Animation step: slide, update text & highlight row
+    function step() {
+      // wrap around
+      if (pos > maxPos) pos = 0;
+
+      // move highlight on input
+      highlight.style.left = (pos * 40) + 'px';
+
+      // update text below
+      windowDisplay.textContent = `Window ${pos}: [${windows[pos].join(', ')}]`;
+
+      // highlight current row in the matrix
+      document
+        .querySelectorAll('.window-row')
+        .forEach(r => r.classList.remove('highlight-row'));
+      document.getElementById('row-'+pos)
+        .classList.add('highlight-row');
+
+      pos++;
+    }
+
+    // start
+    window.onload = () => {
+      step();
+      setInterval(step, 1000);
+    };
+  </script>
+</body>
+</html>
+
+
